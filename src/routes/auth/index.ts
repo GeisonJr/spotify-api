@@ -69,24 +69,24 @@ router.get('/login', async (req, res) => {
 /**
  * Logout the user
  */
-router.post('/logout', (_req, res) => {
+router.get('/logout', (_req, res) => {
   try {
     // Clear the access token and refresh token cookies with same options used when setting
     res.clearCookie('access_token', {
-      httpOnly: false,
+      httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax'
     })
     res.clearCookie('refresh_token', {
-      httpOnly: false,
+      httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax'
     })
 
+    const frontendUrl = process.env.FRONTEND_URL as string
+
     // Redirect to the home page or login page
-    res.json({
-      message: 'Logged out successfully'
-    })
+    res.redirect(frontendUrl)
   } catch (error) {
     if (error instanceof Error)
       res.status(500).json({
@@ -149,7 +149,7 @@ router.get('/callback', async (req, res) => {
 
     // Set the access token in cookies
     res.cookie('access_token', data.access_token, {
-      httpOnly: false, // Allow frontend JavaScript to access the cookie
+      httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: data.expires_in * 1000
@@ -157,15 +157,11 @@ router.get('/callback', async (req, res) => {
 
     // Set the refresh token in cookies
     res.cookie('refresh_token', data.refresh_token, {
-      httpOnly: false, // Allow frontend JavaScript to access the cookie
+      httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: data.expires_in * 1000
     })
-
-    console.log(res)
-
-    console.log(frontendUrl)
 
     res.redirect(frontendUrl)
   } catch (error) {
