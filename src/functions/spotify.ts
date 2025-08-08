@@ -4,8 +4,8 @@ interface Options extends RequestInit {
 
 async function fetcher(url: string, accessToken: string, options?: Options) {
 
-  const spotifyUrl = new URL('https://api.spotify.com/v1')
-  spotifyUrl.pathname = url
+  const spotifyUrl = new URL('https://api.spotify.com')
+  spotifyUrl.pathname = `/v1/${url.replace(/^\//, '')}`
 
   const params = options?.params
   if (params) {
@@ -14,7 +14,6 @@ async function fetcher(url: string, accessToken: string, options?: Options) {
   }
 
   return await fetch(spotifyUrl, {
-    credentials: 'include',
     ...options,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
