@@ -197,7 +197,7 @@ router.post('/refresh', async (req, res) => {
     const refreshToken = req.cookies['refresh_token']
 
     if (!refreshToken) {
-      return res.status(401).json({
+      return res.status(400).json({
         error: 'No refresh token provided',
         message: 'Refresh token is required to refresh access token'
       })
