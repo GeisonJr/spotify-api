@@ -19,12 +19,19 @@ router.get('/login', async (req, res) => {
     const state = crypto.randomBytes(16).toString('hex')
 
     const scopes = [
+      // Read access to user's subscription details (type of user account).
       'user-read-private',
+      // Read access to user's email address.
       'user-read-email',
+      // Read access to a user's top artists and tracks.
       'user-top-read',
+      // Read access to user's private playlists.
       'playlist-read-private',
+      // Include collaborative playlists when requesting a user's playlists.
       'playlist-read-collaborative',
+      // Write access to a user's private playlists.
       'playlist-modify-private',
+      // Write access to a user's public playlists.
       'playlist-modify-public'
     ]
 
