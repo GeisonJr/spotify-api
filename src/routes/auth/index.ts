@@ -1,38 +1,17 @@
 import crypto from 'crypto'
 import express from 'express'
 import { api } from '../../functions/api'
-import { TokenResponse } from '../../types'
+import { spotify } from '../../functions/spotify'
+import { TokenResponse, UserResponse } from '../../types'
+
+const IS_PRODUCTION = process.env.NODE_ENV === 'production'
+const FRONTEND_URL = process.env.FRONTEND_URL ?? ''
+const EXPIRES_IN = 30 * 24 * 60 * 60 * 1000 // 30 days
 
 const router = express.Router()
 
 /**
- * Check if the user is authenticated
- */
-router.get('/is-authenticated', (req, res) => {
-  try {
-    const accessToken = req.cookies.access_token
-    const refreshToken = req.cookies.refresh_token
-
-    if (accessToken && refreshToken) {
-      return res.status(200).json({
-        authenticated: true
-      })
-    }
-
-    res.status(200).json({
-      authenticated: false
-    })
-  } catch (error) {
-    if (error instanceof Error)
-      res.status(500).json({
-        error: 'Failed to check authentication',
-        message: error.message
-      })
-  }
-})
-
-/**
- * Retrieve the login URL for Spotify authentication
+ * Request User Authorization
  * @see https://developer.spotify.com/documentation/web-api/tutorials/code-flow/#request-user-authorization
  */
 router.get('/login', async (req, res) => {
@@ -49,10 +28,13 @@ router.get('/login', async (req, res) => {
       'playlist-modify-public'
     ]
 
+    const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID ?? ''
+    const SPOTIFY_REDIRECT_URI = process.env.SPOTIFY_REDIRECT_URI ?? ''
+
     const url = new URL('https://accounts.spotify.com/authorize')
     url.searchParams.append('response_type', 'code')
-    url.searchParams.append('client_id', process.env.SPOTIFY_CLIENT_ID || '')
-    url.searchParams.append('redirect_uri', process.env.SPOTIFY_REDIRECT_URI || '')
+    url.searchParams.append('client_id', SPOTIFY_CLIENT_ID)
+    url.searchParams.append('redirect_uri', SPOTIFY_REDIRECT_URI)
     url.searchParams.append('scope', scopes.join(' '))
     url.searchParams.append('state', state)
 
@@ -71,20 +53,28 @@ router.get('/login', async (req, res) => {
  */
 router.get('/logout', (_req, res) => {
   try {
-    // Clear the access token and refresh token cookies with same options used when setting
+    // Clear the access token from cookies
     res.clearCookie('access_token', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax'
-    })
-    res.clearCookie('refresh_token', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: IS_PRODUCTION,
       sameSite: 'lax'
     })
 
-    const frontendUrl = process.env.FRONTEND_URL as string
-    const url = new URL('/', frontendUrl)
+    // Clear the refresh token from cookies
+    res.clearCookie('refresh_token', {
+      httpOnly: true,
+      secure: IS_PRODUCTION,
+      sameSite: 'lax'
+    })
+
+    // Clear the user ID from cookies
+    res.clearCookie('user_id', {
+      httpOnly: true,
+      secure: IS_PRODUCTION,
+      sameSite: 'lax'
+    })
+
+    const url = new URL('/', FRONTEND_URL)
     res.redirect(url.toString())
   } catch (error) {
     if (error instanceof Error)
@@ -96,7 +86,7 @@ router.get('/logout', (_req, res) => {
 })
 
 /**
- * Handle Spotify authentication callback
+ * Request an access token
  * @see https://developer.spotify.com/documentation/web-api/tutorials/code-flow/#request-an-access-token
  */
 router.get('/callback', async (req, res) => {
@@ -119,50 +109,68 @@ router.get('/callback', async (req, res) => {
       })
     }
 
-    const clientId = process.env.SPOTIFY_CLIENT_ID
-    const clientSecret = process.env.SPOTIFY_CLIENT_SECRET
-    const redirectUri = process.env.SPOTIFY_REDIRECT_URI as string
+    const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID ?? ''
+    const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET ?? ''
+    const SPOTIFY_REDIRECT_URI = process.env.SPOTIFY_REDIRECT_URI ?? ''
 
     // Exchange the authorization code for an access token
-    const authentication = await api.post('https://accounts.spotify.com/api/token', {
+    const tokenResponse = await api.post('https://accounts.spotify.com/api/token', {
       headers: {
-        'Authorization': `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
+        'Authorization': `Basic ${Buffer.from(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`).toString('base64')}`,
         'Content-Type': 'application/x-www-form-urlencoded'
       },
       params: {
         code: code as string,
         grant_type: 'authorization_code',
-        redirect_uri: redirectUri
+        redirect_uri: SPOTIFY_REDIRECT_URI
       }
     })
 
-    if (!authentication.ok) {
-      return res.status(authentication.status).json({
+    if (!tokenResponse.ok) {
+      return res.status(tokenResponse.status).json({
         error: 'Failed to authenticate',
-        message: `Authentication failed: ${authentication.statusText}`
+        message: `Authentication failed: ${tokenResponse.statusText}`
       })
     }
 
-    const data = await authentication.json() as TokenResponse
+    const tokens = await tokenResponse.json() as TokenResponse
 
     // Set the access token in cookies
-    res.cookie('access_token', data.access_token, {
+    res.cookie('access_token', tokens.access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: IS_PRODUCTION,
       sameSite: 'lax',
-      maxAge: data.expires_in * 1000
+      maxAge: tokens.expires_in * 1000
     })
 
     // Set the refresh token in cookies
-    res.cookie('refresh_token', data.refresh_token, {
+    res.cookie('refresh_token', tokens.refresh_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: IS_PRODUCTION,
       sameSite: 'lax',
-      maxAge: data.expires_in * 1000
+      maxAge: EXPIRES_IN
     })
 
-    const frontendUrl = process.env.FRONTEND_URL as string
-    const url = new URL('/home', frontendUrl)
+    const userResponse = await spotify.get('/me', tokens.access_token)
+
+    if (!userResponse.ok) {
+      return res.status(userResponse.status).json({
+        error: 'Failed to get user profile',
+        message: userResponse.statusText
+      })
+    }
+
+    const user = await userResponse.json() as UserResponse
+
+    // Set the user ID in cookies
+    res.cookie('user_id', user.id, {
+      httpOnly: true,
+      secure: IS_PRODUCTION,
+      sameSite: 'lax',
+      maxAge: EXPIRES_IN
+    })
+
+    const url = new URL('/home', FRONTEND_URL)
     res.redirect(url.toString())
   } catch (error) {
     if (error instanceof Error)

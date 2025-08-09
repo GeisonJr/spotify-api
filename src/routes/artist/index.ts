@@ -6,7 +6,7 @@ import type { AlbumsResponse, ArtistResponse } from '../../types'
 const router = express.Router()
 
 /**
- * Retrieve the user's top artists
+ * Get User's Top Items (Artists)
  * @see https://developer.spotify.com/documentation/web-api/reference/get-users-top-artists-and-tracks
  */
 router.get('/me/top-artists', redirectIfNotAuthenticated, async (req, res) => {
@@ -65,7 +65,7 @@ router.get('/me/top-artists', redirectIfNotAuthenticated, async (req, res) => {
 })
 
 /**
- * Retrieve artist's albums
+ * Get Artist's Albums
  * @see https://developer.spotify.com/documentation/web-api/reference/get-an-artists-albums
  */
 router.get('/:artistId/albums', redirectIfNotAuthenticated, async (req, res) => {

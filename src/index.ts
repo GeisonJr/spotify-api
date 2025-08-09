@@ -4,13 +4,15 @@ import 'dotenv/config'
 import express, { NextFunction, Request, Response } from 'express'
 import routes from './routes'
 
+const FRONTEND_URL = process.env.FRONTEND_URL as string
+
 const app = express()
 
 app.use(express.json())
 app.use(cookieParser())
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL,
+  origin: FRONTEND_URL,
   credentials: true
 }))
 

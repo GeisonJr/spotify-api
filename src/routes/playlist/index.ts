@@ -6,8 +6,8 @@ import type { PlaylistResponse } from '../../types'
 const router = express.Router()
 
 /**
- * Retrieve artist's albums
- * @see https://developer.spotify.com/documentation/web-api/reference/get-an-artists-albums
+ * Get Current User's Playlists
+ * @see https://developer.spotify.com/documentation/web-api/reference/get-a-list-of-current-users-playlists
  */
 router.get('/me', redirectIfNotAuthenticated, async (req, res) => {
   try {
