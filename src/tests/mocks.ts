@@ -1,4 +1,4 @@
-import type { ArtistResponse, TokenResponse, UserResponse } from '../types'
+import type { ArtistResponse, PlaylistResponse, TokenResponse, UserResponse } from '../types'
 
 export const mockTokenResponse: TokenResponse = {
   access_token: 'mock_access_token',
@@ -49,6 +49,16 @@ export const mockTopArtistsResponse: ArtistResponse = {
 
 export const mockAlbumsResponse: ArtistResponse = {
   href: 'https://api.spotify.com/v1/artists/mock_artist_id/albums',
+  limit: 5,
+  next: null,
+  offset: 0,
+  previous: null,
+  total: 0,
+  items: []
+}
+
+export const mockPlaylistsResponse: PlaylistResponse = {
+  href: 'https://api.spotify.com/v1/me/playlists',
   limit: 5,
   next: null,
   offset: 0,
