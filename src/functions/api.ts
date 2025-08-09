@@ -13,7 +13,6 @@ async function fetcher(url: string, options?: Options) {
   }
 
   return await fetch(apiUrl, {
-    credentials: 'include',
     ...options,
     headers: {
       'Content-Type': 'application/json',
