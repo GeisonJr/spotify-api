@@ -6,9 +6,10 @@ import { NextFunction, Request, Response } from 'express'
 export const redirectIfNotAuthenticated = (req: Request, res: Response, next: NextFunction) => {
   const accessToken = req.cookies.access_token
   const refreshToken = req.cookies.refresh_token
+  const userId = req.cookies.user_id
 
   // If tokens are missing, redirect to frontend login
-  if (!accessToken || !refreshToken) {
+  if (!accessToken || !refreshToken || !userId) {
     return res.status(401).json({
       message: 'Authentication required',
     })
