@@ -11,7 +11,8 @@ export const redirectIfNotAuthenticated = (req: Request, res: Response, next: Ne
   // If tokens are missing, redirect to frontend login
   if (!accessToken || !refreshToken || !userId) {
     return res.status(401).json({
-      message: 'Authentication required',
+      error: 'Authentication required',
+      message: 'Please log in to continue'
     })
   }
 
