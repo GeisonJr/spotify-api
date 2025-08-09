@@ -85,8 +85,8 @@ describe('Routes /artist/:artistId/albums', () => {
         'mock_access_token',
         expect.objectContaining({
           params: expect.objectContaining({
-            limit: expect.any(Number),
-            offset: expect.any(Number),
+            limit: expect.any(String),
+            offset: expect.any(String),
             include_groups: expect.any(String)
           })
         })

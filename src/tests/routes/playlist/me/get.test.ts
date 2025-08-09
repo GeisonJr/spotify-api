@@ -85,8 +85,8 @@ describe('Routes /playlist/me', () => {
         'mock_access_token',
         expect.objectContaining({
           params: expect.objectContaining({
-            limit: expect.any(Number),
-            offset: expect.any(Number)
+            limit: expect.any(String),
+            offset: expect.any(String)
           })
         })
       )

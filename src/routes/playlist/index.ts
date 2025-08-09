@@ -22,8 +22,8 @@ router.get('/me', redirectIfNotAuthenticated, async (req, res) => {
 
     const response = await spotify.get('/me/playlists', accessToken, {
       params: {
-        limit,
-        offset
+        limit: limit.toString(),
+        offset: offset.toString()
       }
     })
 

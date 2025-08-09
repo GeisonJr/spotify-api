@@ -85,8 +85,8 @@ describe('Routes /artist/me/top-artists', () => {
         'mock_access_token',
         expect.objectContaining({
           params: expect.objectContaining({
-            limit: expect.any(Number),
-            offset: expect.any(Number),
+            limit: expect.any(String),
+            offset: expect.any(String),
             time_range: expect.stringMatching(/short_term|medium_term|long_term/)
           })
         })

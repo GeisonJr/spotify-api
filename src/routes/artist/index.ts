@@ -30,8 +30,8 @@ router.get('/me/top-artists', redirectIfNotAuthenticated, async (req, res) => {
 
     const response = await spotify.get('/me/top/artists', accessToken, {
       params: {
-        limit,
-        offset,
+        limit: limit.toString(),
+        offset: offset.toString(),
         time_range: timeRange
       }
     })
@@ -92,8 +92,8 @@ router.get('/:artistId/albums', redirectIfNotAuthenticated, async (req, res) => 
 
     const response = await spotify.get(`/artists/${artistId}/albums`, accessToken, {
       params: {
-        limit,
-        offset,
+        limit: limit.toString(),
+        offset: offset.toString(),
         include_groups: includeGroups
       }
     })
