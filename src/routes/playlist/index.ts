@@ -68,7 +68,9 @@ router.post('/me', redirectIfNotAuthenticated, async (req, res) => {
 
     const response = await spotify.post(`/users/${userId}/playlists`, accessToken, {
       body: JSON.stringify({
-        name
+        name,
+        description: 'Created via Spotify API',
+        public: false
       })
     })
 
