@@ -46,3 +46,13 @@ export const mockTopArtistsResponse: ArtistResponse = {
   total: 0,
   items: []
 }
+
+export const mockAlbumsResponse: ArtistResponse = {
+  href: 'https://api.spotify.com/v1/artists/mock_artist_id/albums',
+  limit: 5,
+  next: null,
+  offset: 0,
+  previous: null,
+  total: 0,
+  items: []
+}
