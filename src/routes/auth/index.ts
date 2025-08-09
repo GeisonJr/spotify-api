@@ -181,4 +181,71 @@ router.get('/callback', async (req, res) => {
   }
 })
 
+/**
+ * Refreshing tokens
+ * @see https://developer.spotify.com/documentation/web-api/tutorials/refreshing-tokens
+ */
+router.post('/refresh', async (req, res) => {
+  try {
+    const refreshToken = req.cookies['refresh_token']
+
+    if (!refreshToken) {
+      return res.status(401).json({
+        error: 'No refresh token provided',
+        message: 'Refresh token is required to refresh access token'
+      })
+    }
+
+    const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID ?? ''
+    const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET ?? ''
+
+    const response = await api.post('https://accounts.spotify.com/api/token', {
+      headers: {
+        'Authorization': `Basic ${Buffer.from(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`).toString('base64')}`,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      params: {
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken
+      }
+    })
+
+    if (!response.ok) {
+      return res.status(response.status).json({
+        error: 'Failed to refresh token',
+        message: response.statusText
+      })
+    }
+
+    const tokens = await response.json() as TokenResponse
+
+    // Set the new access token in cookies
+    res.cookie('access_token', tokens.access_token, {
+      httpOnly: true,
+      secure: IS_PRODUCTION,
+      sameSite: 'lax',
+      maxAge: tokens.expires_in * 1000
+    })
+
+    if (tokens.refresh_token) {
+      // Set the new refresh token in cookies if provided
+      res.cookie('refresh_token', tokens.refresh_token, {
+        httpOnly: true,
+        secure: IS_PRODUCTION,
+        sameSite: 'lax',
+        maxAge: EXPIRES_IN
+      })
+    }
+
+    res.status(204).send()
+
+  } catch (error) {
+    if (error instanceof Error)
+      res.status(500).json({
+        error: 'Failed to refresh token',
+        message: error.message
+      })
+  }
+})
+
 export default router
