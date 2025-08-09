@@ -1,5 +1,6 @@
 import express from 'express'
 import { spotify } from '../../functions/spotify'
+import { redirectIfNotAuthenticated } from '../../middleware/auth'
 import type { AlbumsResponse, ArtistResponse } from '../../types'
 
 const router = express.Router()
@@ -8,12 +9,12 @@ const router = express.Router()
  * Retrieve the user's top artists
  * @see https://developer.spotify.com/documentation/web-api/reference/get-users-top-artists-and-tracks
  */
-router.get('/me/top-artists', async (req, res) => {
+router.get('/me/top-artists', redirectIfNotAuthenticated, async (req, res) => {
   try {
     const accessToken = req.cookies['access_token']
 
     // 0-50
-    const limit = 20
+    const limit = 5
 
     // 0 or greater
     const parsedOffset = parseInt(req.query.offset as string) || 0
@@ -67,14 +68,14 @@ router.get('/me/top-artists', async (req, res) => {
  * Retrieve artist's albums
  * @see https://developer.spotify.com/documentation/web-api/reference/get-an-artists-albums
  */
-router.get('/:artistId/albums', async (req, res) => {
+router.get('/:artistId/albums', redirectIfNotAuthenticated, async (req, res) => {
   try {
     const { artistId } = req.params
 
     const accessToken = req.cookies['access_token']
 
     // 0-50
-    const limit = 20
+    const limit = 5
 
     // 0 or greater
     const parsedOffset = parseInt(req.query.offset as string) || 0

@@ -1,5 +1,6 @@
 import express from 'express'
 import { spotify } from '../../functions/spotify'
+import { redirectIfNotAuthenticated } from '../../middleware/auth'
 import type { PlaylistResponse } from '../../types'
 
 const router = express.Router()
@@ -8,12 +9,12 @@ const router = express.Router()
  * Retrieve artist's albums
  * @see https://developer.spotify.com/documentation/web-api/reference/get-an-artists-albums
  */
-router.get('/me', async (req, res) => {
+router.get('/me', redirectIfNotAuthenticated, async (req, res) => {
   try {
     const accessToken = req.cookies['access_token']
 
     // 0-50
-    const limit = 20
+    const limit = 5
 
     // 0 or greater
     const parsedOffset = parseInt(req.query.offset as string) || 0

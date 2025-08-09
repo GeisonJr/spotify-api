@@ -1,5 +1,6 @@
 import express from 'express'
 import { spotify } from '../../functions/spotify'
+import { redirectIfNotAuthenticated } from '../../middleware/auth'
 import { UserResponse } from '../../types'
 
 const router = express.Router()
@@ -8,7 +9,7 @@ const router = express.Router()
  * Retrieve user profile
  * @see https://developer.spotify.com/documentation/web-api/reference/get-current-users-profile
  */
-router.get('/profile', async (req, res) => {
+router.get('/profile', redirectIfNotAuthenticated, async (req, res) => {
   try {
     const accessToken = req.cookies['access_token']
 

@@ -19,7 +19,7 @@ router.get('/is-authenticated', (req, res) => {
       })
     }
 
-    res.status(401).json({
+    res.status(200).json({
       authenticated: false
     })
   } catch (error) {
@@ -84,9 +84,8 @@ router.get('/logout', (_req, res) => {
     })
 
     const frontendUrl = process.env.FRONTEND_URL as string
-
-    // Redirect to the home page or login page
-    res.redirect(frontendUrl)
+    const url = new URL('/', frontendUrl)
+    res.redirect(url.toString())
   } catch (error) {
     if (error instanceof Error)
       res.status(500).json({
@@ -123,7 +122,6 @@ router.get('/callback', async (req, res) => {
     const clientId = process.env.SPOTIFY_CLIENT_ID
     const clientSecret = process.env.SPOTIFY_CLIENT_SECRET
     const redirectUri = process.env.SPOTIFY_REDIRECT_URI as string
-    const frontendUrl = process.env.FRONTEND_URL as string
 
     // Exchange the authorization code for an access token
     const authentication = await api.post('https://accounts.spotify.com/api/token', {
@@ -163,7 +161,9 @@ router.get('/callback', async (req, res) => {
       maxAge: data.expires_in * 1000
     })
 
-    res.redirect(frontendUrl)
+    const frontendUrl = process.env.FRONTEND_URL as string
+    const url = new URL('/home', frontendUrl)
+    res.redirect(url.toString())
   } catch (error) {
     if (error instanceof Error)
       res.status(500).json({
