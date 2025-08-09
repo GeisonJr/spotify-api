@@ -1,4 +1,4 @@
-import type { ArtistResponse, PlaylistResponse, TokenResponse, UserResponse } from '../types'
+import type { ArtistResponse, PlaylistCreateResponse, PlaylistResponse, TokenResponse, UserResponse } from '../types'
 
 export const mockTokenResponse: TokenResponse = {
   access_token: 'mock_access_token',
@@ -65,4 +65,30 @@ export const mockPlaylistsResponse: PlaylistResponse = {
   previous: null,
   total: 0,
   items: []
+}
+
+export const mockPlaylistCreateResponse: PlaylistCreateResponse = {
+  collaborative: false,
+  description: 'Created via Spotify API',
+  external_urls: {
+    spotify: 'https://open.spotify.com/playlist/mock_playlist_id'
+  },
+  href: 'https://api.spotify.com/v1/playlists/mock_playlist_id',
+  id: 'mock_playlist_id',
+  images: [],
+  name: 'Mock Playlist',
+  owner: mockUserResponse,
+  public: false,
+  snapshot_id: 'mock_snapshot_id',
+  tracks: {
+    href: 'https://api.spotify.com/v1/playlists/mock_playlist_id/tracks',
+    total: 0,
+    limit: 100,
+    offset: 0,
+    next: null,
+    previous: null,
+    items: []
+  },
+  type: 'playlist',
+  uri: 'spotify:playlist:mock_playlist_id'
 }

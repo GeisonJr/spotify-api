@@ -58,7 +58,7 @@ router.post('/me', redirectIfNotAuthenticated, async (req, res) => {
     const accessToken = req.cookies['access_token']
     const userId = req.cookies['user_id']
 
-    const { name } = req.body
+    const { name } = req.body ?? {}
 
     if (!name) {
       return res.status(400).json({
