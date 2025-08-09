@@ -27,6 +27,7 @@ routes(app)
 
 // Catch-all route for 404 errors
 app.use((req, res) => {
+  console.error(`404 Not Found: ${req.originalUrl}`)
   res.status(404).json({
     error: 'Not Found',
     message: `The requested URL ${req.originalUrl} was not found on this server.`
