@@ -77,7 +77,7 @@ describe('Routes /auth/callback', () => {
       mockApi.post.mockResolvedValue({
         ok: false,
         status: 500
-      } as any)
+      } as Response)
 
       const response = await request(app)
         .get('/auth/callback')
@@ -97,13 +97,13 @@ describe('Routes /auth/callback', () => {
         ok: true,
         status: 200,
         json: () => Promise.resolve(mockTokenResponse)
-      } as any)
+      } as Response)
 
       // Mock failed user profile fetch
       mockSpotify.get.mockResolvedValue({
         ok: false,
         status: 500
-      } as any)
+      } as Response)
 
       const response = await request(app)
         .get('/auth/callback')
@@ -123,14 +123,14 @@ describe('Routes /auth/callback', () => {
         ok: true,
         status: 200,
         json: () => Promise.resolve(mockTokenResponse)
-      } as any)
+      } as Response)
 
       // Mock successful user profile fetch
       mockSpotify.get.mockResolvedValue({
         ok: true,
         status: 200,
         json: () => Promise.resolve(mockUserResponse)
-      } as any)
+      } as Response)
 
       await request(app)
         .get('/auth/callback')
@@ -169,14 +169,14 @@ describe('Routes /auth/callback', () => {
         ok: true,
         status: 200,
         json: () => Promise.resolve(mockTokenResponse)
-      } as any)
+      } as Response)
 
       // Mock successful user profile fetch
       mockSpotify.get.mockResolvedValue({
         ok: true,
         status: 200,
         json: () => Promise.resolve(mockUserResponse)
-      } as any)
+      } as Response)
 
       const response = await request(app)
         .get('/auth/callback')

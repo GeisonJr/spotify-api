@@ -2,17 +2,12 @@ import cookieParser from 'cookie-parser'
 import express from 'express'
 import request from 'supertest'
 import { api } from '../../../functions/api'
-import { spotify } from '../../../functions/spotify'
 import authRouter from '../../../routes/auth'
 import { mockTokenResponse } from '../../mocks'
 
 // Mock the api module
 jest.mock('../../../functions/api')
 const mockApi = api as jest.Mocked<typeof api>
-
-// Mock the spotify module
-jest.mock('../../../functions/spotify')
-const mockSpotify = spotify as jest.Mocked<typeof spotify>
 
 // Create test app
 const createTestApp = () => {
@@ -52,7 +47,7 @@ describe('Routes /auth/refresh', () => {
       mockApi.post.mockResolvedValue({
         ok: false,
         status: 500
-      } as any)
+      } as Response)
 
       const response = await request(app)
         .post('/auth/refresh')
@@ -71,7 +66,7 @@ describe('Routes /auth/refresh', () => {
         ok: true,
         status: 200,
         json: () => Promise.resolve(mockTokenResponse)
-      } as any)
+      } as Response)
 
       await request(app)
         .post('/auth/refresh')
@@ -102,7 +97,7 @@ describe('Routes /auth/refresh', () => {
         ok: true,
         status: 200,
         json: () => Promise.resolve(mockTokenResponse)
-      } as any)
+      } as Response)
 
       const response = await request(app)
         .post('/auth/refresh')

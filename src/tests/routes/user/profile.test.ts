@@ -48,7 +48,7 @@ describe('Routes /user/profile', () => {
       mockSpotify.get.mockResolvedValue({
         ok: false,
         status: 500
-      } as any)
+      } as Response)
 
       const response = await request(app)
         .get('/user/profile')
@@ -69,7 +69,7 @@ describe('Routes /user/profile', () => {
         ok: true,
         status: 200,
         json: () => Promise.resolve(mockUserResponse)
-      } as any)
+      } as Response)
 
       await request(app)
         .get('/user/profile')
@@ -93,7 +93,7 @@ describe('Routes /user/profile', () => {
         ok: true,
         status: 200,
         json: () => Promise.resolve(mockUserResponse)
-      } as any)
+      } as Response)
 
       const response = await request(app)
         .get('/user/profile')

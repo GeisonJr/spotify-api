@@ -48,7 +48,7 @@ describe('Routes /artist/me/top-artists', () => {
       mockSpotify.get.mockResolvedValue({
         ok: false,
         status: 500
-      } as any)
+      } as Response)
 
       const response = await request(app)
         .get('/artist/me/top-artists')
@@ -69,7 +69,7 @@ describe('Routes /artist/me/top-artists', () => {
         ok: true,
         status: 200,
         json: () => Promise.resolve(mockTopArtistsResponse)
-      } as any)
+      } as Response)
 
       await request(app)
         .get('/artist/me/top-artists')
@@ -100,7 +100,7 @@ describe('Routes /artist/me/top-artists', () => {
         ok: true,
         status: 200,
         json: () => Promise.resolve(mockTopArtistsResponse)
-      } as any)
+      } as Response)
 
       const response = await request(app)
         .get('/artist/me/top-artists')

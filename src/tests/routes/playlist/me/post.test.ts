@@ -62,7 +62,7 @@ describe('Routes /playlist/me', () => {
       mockSpotify.post.mockResolvedValue({
         ok: false,
         status: 500
-      } as any)
+      } as Response)
 
       const response = await request(app)
         .post('/playlist/me')
@@ -86,7 +86,7 @@ describe('Routes /playlist/me', () => {
         ok: true,
         status: 200,
         json: () => Promise.resolve(mockPlaylistCreateResponse)
-      } as any)
+      } as Response)
 
       await request(app)
         .post('/playlist/me')
@@ -116,7 +116,7 @@ describe('Routes /playlist/me', () => {
         ok: true,
         status: 200,
         json: () => Promise.resolve(mockPlaylistCreateResponse)
-      } as any)
+      } as Response)
 
       const response = await request(app)
         .post('/playlist/me')

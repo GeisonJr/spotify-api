@@ -1,5 +1,5 @@
 interface Options extends RequestInit {
-  params?: Record<string, any>
+  params?: Record<string, string>
 }
 
 async function fetcher(url: string, accessToken: string, options?: Options) {

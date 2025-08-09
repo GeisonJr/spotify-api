@@ -1,7 +1,7 @@
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import 'dotenv/config'
-import express, { NextFunction, Request, Response } from 'express'
+import express, { Request, Response } from 'express'
 import routes from './routes'
 
 const FRONTEND_URL = process.env.FRONTEND_URL as string
@@ -41,7 +41,7 @@ interface ErrorWithStack extends Error {
   stack?: string
 }
 
-app.use((err: ErrorWithStack, _req: Request, res: Response, _next: NextFunction) => {
+app.use((err: ErrorWithStack, _req: Request, res: Response) => {
   console.error(err.stack)
   res.status(500).json({
     error: 'Internal Server Error',
