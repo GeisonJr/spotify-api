@@ -11,7 +11,7 @@ export interface Album {
     url: string
     height: number | null
     width: number | null
-  }[]
+  }[] | null
   name: string
   release_date: string
   release_date_precision: string
@@ -59,7 +59,7 @@ export interface Artist {
     url: string
     height: number
     width: number
-  }[]
+  }[] | null
   name: string
   popularity: number
   type: string
@@ -88,7 +88,7 @@ export interface Playlist {
     url: string
     height: number | null
     width: number | null
-  }[]
+  }[] | null
   name: string
   owner: {
     external_urls: {
