@@ -109,7 +109,13 @@ router.get('/:artistId/albums', redirectIfNotAuthenticated, async (req, res) => 
 
     res.json({
       message: 'Artist albums retrieved successfully',
-      data
+      data,
+      pagination: {
+        hasNext: !!data.next,
+        hasPrevious: !!data.previous,
+        currentPage: Math.floor(offset / limit) + 1,
+        totalPages: Math.ceil(data.total / limit)
+      }
     })
   } catch (error) {
     if (error instanceof Error)

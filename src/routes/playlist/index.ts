@@ -38,7 +38,13 @@ router.get('/me', redirectIfNotAuthenticated, async (req, res) => {
 
     res.json({
       message: 'User playlists retrieved successfully',
-      data
+      data,
+      pagination: {
+        hasNext: !!data.next,
+        hasPrevious: !!data.previous,
+        currentPage: Math.floor(offset / limit) + 1,
+        totalPages: Math.ceil(data.total / limit)
+      }
     })
   } catch (error) {
     if (error instanceof Error)
@@ -62,7 +68,8 @@ router.post('/me', redirectIfNotAuthenticated, async (req, res) => {
 
     if (!name) {
       return res.status(400).json({
-        error: 'Name is required to create a playlist'
+        error: 'Name is required to create a playlist',
+        message: 'Please provide a name for the playlist'
       })
     }
 
