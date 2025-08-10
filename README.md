@@ -124,7 +124,7 @@ cd spotify-api
 SPOTIFY_CLIENT_ID=seu_client_id
 SPOTIFY_CLIENT_SECRET=seu_client_secret
 SPOTIFY_REDIRECT_URI=http://localhost:3000/callback
-SESSION_SECRET=umsegurosegredo
+FRONTEND_URL=http://localhost:5555
 ```
 
 ### 3. Instalar dependências
