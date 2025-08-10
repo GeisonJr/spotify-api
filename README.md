@@ -1,20 +1,8 @@
-# Spotify API Backend
+# Spotify API - Backend
 
-Este projeto é uma API backend para integração com a API do Spotify, permitindo autenticação de usuários, consulta de perfis, playlists, artistas e criação de playlists.
-Desenvolvido com foco em **segurança**, **boas práticas de arquitetura** e **testes automatizados**.
+> ⚠ Este repositório contém o backend da aplicação.
 
-## Sumário
-
-* [Versão para Apresentação](#versão-para-apresentação)
-* [Visão Geral da Arquitetura](#visão-geral-da-arquitetura)
-* [Tecnologias Utilizadas](#tecnologias-utilizadas)
-* [Padrões de Arquitetura](#padrões-de-arquitetura)
-* [Pré-requisitos](#pré-requisitos)
-* [Configuração do Ambiente](#configuração-do-ambiente)
-* [Como Executar Localmente](#como-executar-localmente)
-* [Testes](#testes)
-* [Deploy (Fly.io)](#deploy-flyio)
-* [Observações sobre as escolhas técnicas](#observações-sobre-as-escolhas-técnicas)
+A aplicação implementa autenticação e consumo da API do Spotify via OAuth 2.0, expondo endpoints para serem consumidos pelo frontend React.
 
 ## Versão para Apresentação
 
@@ -22,145 +10,159 @@ A versão de apresentação está disponível online para testes em: [https://sp
 
 Para acessar, é necessário autenticar com uma conta do Spotify. Por favor, envie seu nome e e-mail da conta Spotify para que eu possa adicioná-lo(a) como usuário autorizado.
 
-## Visão Geral da Arquitetura
+## Links Úteis
 
-```text
-[Client/Frontend] <---> [Express API] <---> [Spotify API]
+Documentação interativa da API (via Scalar): <https://docs.spotify.geison.dev>
+
+> ⚠ O [Scalar](https://scalar.com) é um visualizador moderno para arquivos OpenAPI, usado aqui para explorar e testar os endpoints gerados pelo backend.
+
+Repositório do backend: <https://github.com/GeisonJr/spotify-api>
+
+Repositório do frontend: <https://github.com/GeisonJr/spotify-app>
+
+## 🚀 Tecnologias utilizadas
+
+* **Node.js** + **TypeScript** – execução e tipagem
+* **Express.js** – framework HTTP
+* **Jest** – testes unitários
+* **ESLint** – padronização de código
+* **Docker** – containerização
+* **Fly.io** – deploy
+* **dotenv** – configuração de variáveis de ambiente
+
+## 📌 Funcionalidades implementadas
+
+* Autenticação com Spotify [OAuth 2.0 Authorization Code Flow com refresh token](https://developer.spotify.com/documentation/web-api/tutorials/code-flow)
+* Middleware de autenticação
+* Listagem de artistas mais ouvidos
+* Listagem de álbuns de um artista específico
+* Criação e listagem de playlists do usuário
+* Exibição do perfil do usuário
+* Paginação de resultados
+
+### Endpoints disponíveis
+
+```dir
+<root>
+├── auth
+│   ├── login           # [GET]  /auth/login               (Generate Spotify login URL)
+│   ├── callback        # [GET]  /auth/callback            (Handle Spotify callback)
+│   ├── logout          # [GET]  /auth/logout              (Logout user)
+│   └── refresh         # [POST] /auth/refresh             (Refresh access token)
+├── user
+│   └── profile         # [GET]  /user/profile             (Get user profile)
+├── artist
+│   ├── me
+│   │   └── top-artists # [GET]  /artist/me/top-artists    (Get top artists)
+│   └── <artistId>
+│       └── albums      # [GET]  /artist/<artistId>/albums (Get artist albums)
+├── playlist
+│   ├── me              # [GET]  /playlist/me              (Get user playlists)
+│   └── me              # [POST] /playlist/me              (Create a new playlist)
+├── status              # [GET]  /status                   (Check if the API is running)
+├── <404>               # [ANY]  /<path>                   (Catch-all for undefined routes)
+└── <500>               # [ANY]  /<path>                   (Catch-all for server errors)
 ```
 
-**Fluxo resumido**:
+## 📂 Estrutura de pastas
 
-1. O cliente inicia a autenticação via OAuth no Spotify.
-2. A API recebe o código de autenticação, solicita o token de acesso e armazena as informações do usuário em cookies seguros.
-3. Usuários autenticados podem consultar o perfil, playlists, artistas, álbuns e criar playlists.
+```dir
+src
+├── routes
+│   ├── auth     # fluxo de autenticação
+│   ├── user     # perfil
+│   ├── artist   # artistas mais ouvidos e álbuns de um artista
+│   └── playlist # criação e listagem de playlists
+├── middleware   # autenticação, erros, logging
+├── functions    # funções auxiliares
+└── tests        # testes unitários
+```
 
-## Tecnologias Utilizadas
+## ✅ Checklist de requisitos
 
-* **Node.js** (v22+)
-* **TypeScript**
-* **Express 5**
-* **Jest** (testes automatizados)
-* **ESLint** (padronização de código)
-* **dotenv** (variáveis de ambiente)
-* **Docker** (containerização)
-* **Fly.io** (deploy cloud)
+### Requisitos obrigatórios
 
-## Padrões de Arquitetura
+* [x] Segmentação de commits
+* [x] Lint
+* [x] Autenticação via Spotify
+* [x] Listar artistas
+* [x] Listar álbuns de um artista
+* [x] Utilizar paginação (scroll infinito ou não) - Frontend
+* [x] Funcionamento offline - Frontend
+* [x] Testes unitários
+* [x] Deploy da aplicação
 
-* **Separação por camadas**: rotas, middlewares, testes, utilitários e tipos.
-* **Middlewares dedicados**:
-  * Autenticação
-  * Tratamento centralizado de erros
-  * Logging de requisições
-* **Módulos independentes**: `auth`, `user`, `artist` e `playlist`, cada um com rotas e controladores próprios.
-* **Testes automatizados**: Cobertura para partes críticas e fluxos de autenticação.
-* **Configuração via `.env`**: URLs e chaves sensíveis centralizadas.
+### Bônus
 
-## Pré-requisitos
+* [ ] Testes E2E
+* [ ] CI/CD (CI não implementado, CD implementado via Fly.io)
+* [ ] Responsividade
+* [ ] Qualidade de código (SonarQube)
+* [ ] PWA
 
-* Node.js 22+
-* npm 10+
-* Conta no Spotify Developer (para obter `CLIENT_ID` e `CLIENT_SECRET`)
+### Outros critérios
 
-## Configuração do Ambiente
+* [x] Exibir perfil do usuário
+* [x] Criar playlists para o usuário
+* [x] Listar playlists do usuário
+* [x] Documentação da API
 
-1. Copie o arquivo `.env.example` para `.env`:
+## ⚙️ Como executar localmente
 
-   ```sh
-   cp .env.example .env
-   ```
+### 1. Clonar o repositório
 
-2. Preencha as variáveis do Spotify no `.env`:
+```bash
+git clone https://github.com/GeisonJr/spotify-api.git
+cd spotify-api
+```
 
-   ```env
-   SPOTIFY_CLIENT_ID=seu_client_id
-   SPOTIFY_CLIENT_SECRET=seu_client_secret
-   SPOTIFY_REDIRECT_URI=http://127.0.0.1:3000/auth/callback
-   FRONTEND_URL=http://127.0.0.1:5555
-   ```
+### 2. Criar arquivo `.env` com variáveis
 
-## Como Executar Localmente
+> ⚠ As credenciais do Spotify devem ser configuradas no [Spotify Developer Dashboard](https://developer.spotify.com/dashboard), garantindo que a Redirect URI seja exatamente a informada abaixo.
 
-Siga os passos abaixo para instalar as dependências, configurar as variáveis de ambiente e iniciar o servidor localmente do zero:
+```env
+SPOTIFY_CLIENT_ID=seu_client_id
+SPOTIFY_CLIENT_SECRET=seu_client_secret
+SPOTIFY_REDIRECT_URI=http://localhost:3000/callback
+SESSION_SECRET=umsegurosegredo
+```
 
-1. Instale as dependências:
+### 3. Instalar dependências
 
-   ```sh
-   npm install
-   ```
+```bash
+npm install
+```
 
-2. Compile o projeto:
+### 4. Rodar em modo desenvolvimento
 
-   ```sh
-   npm run build
-   ```
-
-3. Inicie o servidor:
-
-   ```sh
-   npm start
-   ```
-
-   O servidor estará disponível em [http://127.0.0.1:3000](http://127.0.0.1:3000)
-
-**Modo desenvolvimento:**
-
-```sh
+```bash
 npm run dev
 ```
 
-## Testes
+### 5. Executar testes
 
-Executar todos os testes automatizados:
-
-```sh
-npm test
-```
-
-Gerar relatório de cobertura:
-
-```sh
+```bash
+npm run test
+# ou
 npm run test:coverage
 ```
 
-## Deploy (Fly.io)
+## 📦 Deploy
 
-O projeto já possui configuração pronta para deploy no Fly.io (`fly.toml`).
+O deploy está configurado via **Fly.io**.
+Para publicar alterações:
 
-1. Instale o [Fly CLI](https://fly.io/docs/flyctl/install/)
+```bash
+fly deploy
+```
 
-2. Faça login:
+## 📄 Decisões de arquitetura
 
-   ```sh
-   fly auth login
-   ```
-
-3. Crie a aplicação (caso não exista):
-
-   ```sh
-   fly launch
-   ```
-
-4. Faça o deploy:
-
-   ```sh
-   fly deploy
-   ```
-
-5. Configure as variáveis de ambiente no Fly:
-
-   ```sh
-   fly secrets set SPOTIFY_CLIENT_ID=your_client_id
-   fly secrets set SPOTIFY_CLIENT_SECRET=your_client_secret
-   fly secrets set SPOTIFY_REDIRECT_URI=http://your_fly_app_url/auth/callback
-   fly secrets set FRONTEND_URL=http://your_frontend_url
-   ```
-
-## Observações sobre as escolhas técnicas
-
-* **Express 5**: Praticidade, robustez, comunidade ativa e suporte a middlewares.
-* **TypeScript**: Tipagem estática para segurança e manutenção.
-* **Arquitetura modular**: Facilita manutenção, testes e escalabilidade.
-* **Testes automatizados**: Foco em rotas críticas e autenticação.
-* **Docker**: Uniformiza execução em diferentes ambientes.
-* **Fly.io**: Plataforma moderna para deploy de aplicações Node.js.
+* **Documentação OpenAPI** para fácil entendimento e integração com a API.
+* **Estrutura de pastas organizada** para facilitar a navegação e manutenção do código, com separação clara entre rotas, middleware, funções auxiliares e testes.
+* **Separação por contexto**: cada módulo (`auth`, `user`, `artist`, `playlist`) mantém rotas, controladores e serviços isolados, favorecendo manutenção e escalabilidade.
+* **TypeScript** para tipagem forte e prevenção de erros em tempo de desenvolvimento.
+* **Express.js** como framework HTTP, proporcionando simplicidade e flexibilidade.
+* **Middlewares reutilizáveis** para autenticação, logs e tratamento de erros.
+* **Uso de variáveis de ambiente** para configuração sensível, evitando hardcoding de credenciais.
+* **Docker** para containerização, garantindo consistência entre ambientes de desenvolvimento e produção.
